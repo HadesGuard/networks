@@ -92,6 +92,63 @@ check_command() {
     return 0
 }
 
+# Install prerequisites automatically
+install_prerequisites() {
+    print_info "Checking and installing prerequisites..."
+    
+    # Check and install curl
+    if ! command -v curl &> /dev/null; then
+        print_warn "curl is not installed. Installing..."
+        if [[ "$OS" == "Darwin" ]]; then
+            if command -v brew &> /dev/null; then
+                brew install curl
+            else
+                print_error "Homebrew not found. Please install curl manually: brew install curl"
+                return 1
+            fi
+        elif command -v apt-get &> /dev/null; then
+            sudo apt-get update && sudo apt-get install -y curl
+        elif command -v yum &> /dev/null; then
+            sudo yum install -y curl
+        elif command -v dnf &> /dev/null; then
+            sudo dnf install -y curl
+        else
+            print_error "Cannot auto-install curl. Please install it manually."
+            return 1
+        fi
+        print_info "curl installed successfully!"
+    else
+        print_info "curl is already installed"
+    fi
+    
+    # Check and install jq
+    if ! command -v jq &> /dev/null; then
+        print_warn "jq is not installed. Installing..."
+        if [[ "$OS" == "Darwin" ]]; then
+            if command -v brew &> /dev/null; then
+                brew install jq
+            else
+                print_error "Homebrew not found. Please install jq manually: brew install jq"
+                return 1
+            fi
+        elif command -v apt-get &> /dev/null; then
+            sudo apt-get update && sudo apt-get install -y jq
+        elif command -v yum &> /dev/null; then
+            sudo yum install -y jq
+        elif command -v dnf &> /dev/null; then
+            sudo dnf install -y jq
+        else
+            print_error "Cannot auto-install jq. Please install it manually."
+            return 1
+        fi
+        print_info "jq installed successfully!"
+    else
+        print_info "jq is already installed"
+    fi
+    
+    return 0
+}
+
 # Detect architecture
 detect_arch() {
     ARCH=$(uname -m)

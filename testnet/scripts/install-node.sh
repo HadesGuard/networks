@@ -11,17 +11,21 @@ source "$SCRIPT_DIR/common.sh"
 install_node() {
     print_header "Install/Setup Node"
     
-    # Check prerequisites
-    print_info "Checking prerequisites..."
-    if ! check_command curl; then
+    # Check and install prerequisites
+    if ! install_prerequisites; then
+        print_error "Failed to install prerequisites. Please install curl and jq manually."
+        echo ""
+        print_info "Installation commands:"
+        if [[ "$OS" == "Darwin" ]]; then
+            print_info "  brew install curl jq"
+        elif command -v apt-get &> /dev/null; then
+            print_info "  sudo apt-get update && sudo apt-get install -y curl jq"
+        elif command -v yum &> /dev/null; then
+            print_info "  sudo yum install -y curl jq"
+        fi
         read -p "Press Enter to continue..."
         return 1
     fi
-    if ! check_command jq; then
-        read -p "Press Enter to continue..."
-        return 1
-    fi
-    print_info "Prerequisites check passed!"
     echo ""
     
     # Get moniker
